@@ -168,3 +168,59 @@ SELECT
 FROM fact_swiggy_orders;
 ```
 
+### Cuisine Performance (Orders + Rating)
+```sql
+SELECT
+  c.category AS cuisine,
+  COUNT(*) AS total_orders,
+  CAST(AVG(f.Rating) AS DECIMAL(10,2)) AS avg_rating
+FROM fact_swiggy_orders f
+JOIN dim_category c ON f.category_id = c.category_id
+GROUP BY c.category
+ORDER BY total_orders DESC;
+```
+
+### Pareto Analysis (Top Restaurants – 80/20)
+
+```sql
+SELECT
+  r.restaurant_name,
+  SUM(f.Price_INR) AS total_revenue,
+  SUM(SUM(f.Price_INR)) OVER (ORDER BY SUM(f.Price_INR) DESC) * 100.0
+  / SUM(SUM(f.Price_INR)) OVER () AS cumulative_revenue_pct
+FROM fact_swiggy_orders f
+JOIN dim_restaurant r ON f.restaurant_id = r.restaurant_id
+GROUP BY r.restaurant_name
+ORDER BY total_revenue DESC;
+```
+
+### SQL Concepts Demonstrated
+
+-Fact–Dimension joins
+
+-Aggregations (SUM, COUNT, AVG)
+
+-Window functions (LAG, OVER)
+
+-Conditional logic (CASE)
+
+-Business filtering using HAVING
+
+-Percentage contribution analysis
+
+### Project Structure
+
+sql/
+
+├── 01_data_cleaning.sql
+
+├── 02_schema_creation.sql
+
+├── 03_dimension_load.sql
+
+├── 04_fact_load.sql
+
+├── 05_kpis.sql
+
+└── 06_business_analysis.sql
+
